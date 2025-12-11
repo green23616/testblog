@@ -9,12 +9,12 @@ export const postSchema = z.object({
     .max(200)
     .regex(/^[a-z0-9-]+$/, 'Slug can only contain lowercase letters, numbers, and hyphens'),
   content: z.string().min(10, 'Content must be at least 10 characters'),
-  excerpt: z.string().max(300, 'Excerpt is too long').optional().nullable(),
+  excerpt: z.string().max(300, 'Excerpt is too long').optional().or(z.literal('')).transform(val => val || null),
   published: z.boolean().default(false),
   reading_time_minutes: z.number().int().positive().optional().nullable(),
-  meta_title: z.string().max(60, 'Meta title is too long').optional().nullable(),
-  meta_description: z.string().max(160, 'Meta description is too long').optional().nullable(),
-  og_image: z.string().url('Invalid image URL').optional().nullable(),
+  meta_title: z.string().max(60, 'Meta title is too long').optional().or(z.literal('')).transform(val => val || null),
+  meta_description: z.string().max(160, 'Meta description is too long').optional().or(z.literal('')).transform(val => val || null),
+  og_image: z.string().url('Invalid image URL').optional().or(z.literal('')).transform(val => val || null),
   tag_ids: z.array(z.string().uuid()).optional(),
 })
 
