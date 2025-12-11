@@ -54,7 +54,15 @@ export function PostForm({ post, tags: initialTags }: PostFormProps) {
         router.push('/admin/posts')
         router.refresh()
       } else {
-        setError(typeof result.error === 'string' ? result.error : 'Validation failed')
+        if (typeof result.error === 'string') {
+          setError(result.error)
+        } else {
+          // Format field errors
+          const fieldErrors = Object.entries(result.error || {})
+            .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(', ') : errors}`)
+            .join('\n')
+          setError(fieldErrors || 'Validation failed')
+        }
       }
     } catch (err) {
       setError('Failed to save post')
@@ -68,7 +76,7 @@ export function PostForm({ post, tags: initialTags }: PostFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
         <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-300">
-          {error}
+          <pre className="whitespace-pre-wrap text-sm">{error}</pre>
         </div>
       )}
 
