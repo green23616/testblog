@@ -6,6 +6,7 @@ import type { Post, Tag } from '@/types/database'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { Save, X } from 'lucide-react'
+import { ImageUploader } from '@/components/ImageUploader'
 
 interface PostFormProps {
   post?: Post
@@ -28,6 +29,8 @@ export function PostForm({ post, tags: initialTags }: PostFormProps) {
     meta_title: post?.meta_title || '',
     meta_description: post?.meta_description || '',
     og_image: post?.og_image || '',
+    featured_image: post?.featured_image || '',
+    featured_image_alt: post?.featured_image_alt || '',
     tag_ids: [] as string[],
   })
 
@@ -131,6 +134,14 @@ export function PostForm({ post, tags: initialTags }: PostFormProps) {
           placeholder="Short description (max 300 characters)"
         />
       </div>
+
+      {/* Featured Image */}
+      <ImageUploader
+        currentImageUrl={formData.featured_image}
+        currentImageAlt={formData.featured_image_alt}
+        onUploadComplete={(url) => setFormData({ ...formData, featured_image: url })}
+        onAltTextChange={(alt) => setFormData({ ...formData, featured_image_alt: alt })}
+      />
 
       {/* Content */}
       <div>

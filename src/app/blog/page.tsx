@@ -2,6 +2,7 @@
 
 import { getPosts } from '@/app/actions/posts'
 import Link from 'next/link'
+import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { SearchBar } from '@/components/SearchBar'
@@ -88,33 +89,50 @@ export default function BlogPage() {
           {filteredPosts.map((post) => (
             <article
               key={post.id}
-              className="border border-gray-200 dark:border-gray-800 rounded-lg p-6 hover:shadow-lg transition-shadow"
+              className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
             >
-              <Link href={`/blog/${post.slug}`}>
-                <h2 className="text-2xl font-bold mb-2 hover:text-blue-600 dark:hover:text-blue-400">
-                  {post.title}
-                </h2>
-              </Link>
-
-              {post.excerpt && (
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  {post.excerpt}
-                </p>
+              {/* Featured Image Thumbnail */}
+              {post.featured_image && (
+                <Link href={`/blog/${post.slug}`}>
+                  <div className="relative w-full h-48 bg-gray-100 dark:bg-gray-800">
+                    <Image
+                      src={post.featured_image}
+                      alt={post.featured_image_alt || post.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  </div>
+                </Link>
               )}
 
-              <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-500">
-                <time dateTime={post.created_at}>
-                  {formatDistanceToNow(new Date(post.created_at), {
-                    addSuffix: true,
-                  })}
-                </time>
-                {post.reading_time_minutes && (
-                  <span>{post.reading_time_minutes} min read</span>
-                )}
-              </div>
+              <div className="p-6">
+                <Link href={`/blog/${post.slug}`}>
+                  <h2 className="text-2xl font-bold mb-2 hover:text-blue-600 dark:hover:text-blue-400 text-gray-900 dark:text-gray-100">
+                    {post.title}
+                  </h2>
+                </Link>
 
-              <div className="mt-4 text-sm text-gray-500 dark:text-gray-500">
-                {post.view_count} views
+                {post.excerpt && (
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    {post.excerpt}
+                  </p>
+                )}
+
+                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-500">
+                  <time dateTime={post.created_at}>
+                    {formatDistanceToNow(new Date(post.created_at), {
+                      addSuffix: true,
+                    })}
+                  </time>
+                  {post.reading_time_minutes && (
+                    <span>{post.reading_time_minutes} min read</span>
+                  )}
+                </div>
+
+                <div className="mt-4 text-sm text-gray-500 dark:text-gray-500">
+                  {post.view_count} views
+                </div>
               </div>
             </article>
           ))}

@@ -4,6 +4,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { CommentForm } from '@/components/CommentForm'
 import { CommentList } from '@/components/CommentList'
+import Image from 'next/image'
 import type { Metadata } from 'next'
 
 type Props = {
@@ -20,13 +21,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
 
+  const ogImage = post.og_image || post.featured_image
+
   return {
     title: post.meta_title || post.title,
     description: post.meta_description || post.excerpt || undefined,
     openGraph: {
       title: post.title,
       description: post.excerpt || undefined,
-      images: post.og_image ? [{ url: post.og_image, width: 1200, height: 630 }] : [],
+      images: ogImage ? [{ url: ogImage, width: 1200, height: 630 }] : [],
       type: 'article',
       publishedTime: post.created_at,
     },
@@ -34,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt || undefined,
-      images: post.og_image ? [post.og_image] : [],
+      images: ogImage ? [ogImage] : [],
     },
   }
 }
@@ -55,7 +58,7 @@ export default async function BlogPostPage({ params }: Props) {
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.excerpt || undefined,
-    image: post.og_image || undefined,
+    image: post.og_image || post.featured_image || undefined,
     datePublished: post.created_at,
     dateModified: post.updated_at || post.created_at,
     author: {
@@ -104,6 +107,20 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         )}
       </header>
+
+      {/* Featured Image */}
+      {post.featured_image && (
+        <div className="mb-8 relative w-full h-96 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+          <Image
+            src={post.featured_image}
+            alt={post.featured_image_alt || post.title}
+            fill
+            className="object-cover"
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 768px, 1200px"
+          />
+        </div>
+      )}
 
       <div className="prose dark:prose-invert max-w-none">
         {post.content.split('\n').map((paragraph, index) => (

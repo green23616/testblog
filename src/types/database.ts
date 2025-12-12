@@ -22,6 +22,8 @@ export interface Database {
           meta_title: string | null
           meta_description: string | null
           og_image: string | null
+          featured_image: string | null
+          featured_image_alt: string | null
           created_at: string
           updated_at: string
         }
@@ -37,6 +39,8 @@ export interface Database {
           meta_title?: string | null
           meta_description?: string | null
           og_image?: string | null
+          featured_image?: string | null
+          featured_image_alt?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -52,6 +56,8 @@ export interface Database {
           meta_title?: string | null
           meta_description?: string | null
           og_image?: string | null
+          featured_image?: string | null
+          featured_image_alt?: string | null
           created_at?: string
           updated_at?: string
         }
