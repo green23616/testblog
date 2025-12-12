@@ -1,6 +1,9 @@
 import { getPostBySlug, incrementViewCount } from '@/app/actions/posts'
 import { notFound } from 'next/navigation'
 import { formatDistanceToNow } from 'date-fns'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { CommentForm } from '@/components/CommentForm'
+import { CommentList } from '@/components/CommentList'
 import type { Metadata } from 'next'
 
 type Props = {
@@ -47,10 +50,32 @@ export default async function BlogPostPage({ params }: Props) {
   // Increment view count (fire and forget)
   incrementViewCount(post.id).catch(console.error)
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.excerpt || undefined,
+    image: post.og_image || undefined,
+    datePublished: post.created_at,
+    dateModified: post.updated_at || post.created_at,
+    author: {
+      '@type': 'Person',
+      name: 'Blog Author',
+    },
+  }
+
   return (
-    <article className="container mx-auto px-4 py-16 max-w-3xl">
-      <header className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">{post.title}</h1>
+    <div className="bg-white dark:bg-gray-900 min-h-screen transition-colors">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="absolute top-8 right-8">
+        <ThemeToggle />
+      </div>
+      <article className="container mx-auto px-4 py-16 max-w-3xl">
+        <header className="mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-gray-100">{post.title}</h1>
 
         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
           <time dateTime={post.created_at}>
@@ -88,14 +113,21 @@ export default async function BlogPostPage({ params }: Props) {
         ))}
       </div>
 
-      <footer className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
-        <a
-          href="/blog"
-          className="text-blue-600 dark:text-blue-400 hover:underline"
-        >
-          ← Back to blog
-        </a>
-      </footer>
-    </article>
+        <footer className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+          <a
+            href="/blog"
+            className="text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            ← Back to blog
+          </a>
+        </footer>
+
+        {/* Comments Section */}
+        <section className="mt-12">
+          <CommentList postId={post.id} />
+          <CommentForm postId={post.id} />
+        </section>
+      </article>
+    </div>
   )
 }

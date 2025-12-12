@@ -1,32 +1,91 @@
+'use client'
+
 import { getPosts } from '@/app/actions/posts'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { SearchBar } from '@/components/SearchBar'
+import { useEffect, useState } from 'react'
+import type { Post } from '@/types/database'
 
-export const revalidate = 3600 // Revalidate every hour
+export default function BlogPage() {
+  const [posts, setPosts] = useState<Post[]>([])
+  const [filteredPosts, setFilteredPosts] = useState<Post[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-export default async function BlogPage() {
-  const { posts, error } = await getPosts({ limit: 20 })
+  useEffect(() => {
+    async function loadPosts() {
+      const { posts: data, error: err } = await getPosts({ limit: 20 })
+      if (err) {
+        setError(err)
+      } else {
+        setPosts(data)
+        setFilteredPosts(data)
+      }
+      setIsLoading(false)
+    }
+    loadPosts()
+  }, [])
+
+  const handleSearch = (query: string) => {
+    if (!query.trim()) {
+      setFilteredPosts(posts)
+      return
+    }
+
+    const lowercaseQuery = query.toLowerCase()
+    const filtered = posts.filter(
+      (post) =>
+        post.title.toLowerCase().includes(lowercaseQuery) ||
+        post.excerpt?.toLowerCase().includes(lowercaseQuery) ||
+        post.content.toLowerCase().includes(lowercaseQuery)
+    )
+    setFilteredPosts(filtered)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-16 bg-white dark:bg-gray-900 min-h-screen transition-colors">
+        <div className="absolute top-8 right-8">
+          <ThemeToggle />
+        </div>
+        <h1 className="text-4xl font-bold mb-8 text-gray-900 dark:text-gray-100">Blog</h1>
+        <p className="text-gray-600 dark:text-gray-400">Loading posts...</p>
+      </div>
+    )
+  }
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold mb-8">Blog</h1>
+      <div className="container mx-auto px-4 py-16 bg-white dark:bg-gray-900 min-h-screen transition-colors">
+        <div className="absolute top-8 right-8">
+          <ThemeToggle />
+        </div>
+        <h1 className="text-4xl font-bold mb-8 text-gray-900 dark:text-gray-100">Blog</h1>
         <p className="text-red-600">Error loading posts: {error}</p>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-16">
-      <h1 className="text-4xl font-bold mb-8">Blog</h1>
+    <div className="container mx-auto px-4 py-16 bg-white dark:bg-gray-900 min-h-screen transition-colors">
+      <div className="absolute top-8 right-8">
+        <ThemeToggle />
+      </div>
+      <h1 className="text-4xl font-bold mb-8 text-gray-900 dark:text-gray-100">Blog</h1>
 
-      {posts.length === 0 ? (
+      <div className="mb-8 max-w-2xl">
+        <SearchBar onSearch={handleSearch} />
+      </div>
+
+      {filteredPosts.length === 0 ? (
         <p className="text-gray-600 dark:text-gray-400">
-          No posts yet. Check back soon!
+          {posts.length === 0 ? 'No posts yet. Check back soon!' : 'No posts found matching your search.'}
         </p>
       ) : (
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
+          {filteredPosts.map((post) => (
             <article
               key={post.id}
               className="border border-gray-200 dark:border-gray-800 rounded-lg p-6 hover:shadow-lg transition-shadow"
