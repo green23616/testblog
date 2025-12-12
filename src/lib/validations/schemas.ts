@@ -15,6 +15,8 @@ export const postSchema = z.object({
   meta_title: z.string().max(60, 'Meta title is too long').optional().or(z.literal('')).transform(val => val || null),
   meta_description: z.string().max(160, 'Meta description is too long').optional().or(z.literal('')).transform(val => val || null),
   og_image: z.string().url('Invalid image URL').optional().or(z.literal('')).transform(val => val || null),
+  featured_image: z.string().url('Invalid image URL').optional().or(z.literal('')).transform(val => val || null),
+  featured_image_alt: z.string().max(200, 'Alt text is too long').optional().or(z.literal('')).transform(val => val || null),
   tag_ids: z.array(z.string().uuid()).optional(),
 })
 
