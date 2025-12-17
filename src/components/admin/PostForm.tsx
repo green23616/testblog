@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { Save, X } from 'lucide-react'
 import { ImageUploader } from '@/components/ImageUploader'
+import MarkdownEditor from '@/components/admin/MarkdownEditor'
 
 interface PostFormProps {
   post?: Post
@@ -146,16 +147,12 @@ export function PostForm({ post, tags: initialTags }: PostFormProps) {
       {/* Content */}
       <div>
         <label htmlFor="content" className="block text-sm font-medium mb-2">
-          Content *
+          Content * (Markdown)
         </label>
-        <textarea
-          id="content"
+        <MarkdownEditor
           value={formData.content}
-          onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-          required
-          rows={15}
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
-          placeholder="Write your post content..."
+          onChange={(content) => setFormData({ ...formData, content })}
+          placeholder="Write your post content in markdown..."
         />
       </div>
 

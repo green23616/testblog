@@ -4,12 +4,17 @@ import { formatDistanceToNow } from 'date-fns'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { CommentForm } from '@/components/CommentForm'
 import { CommentList } from '@/components/CommentList'
+import { SocialShare } from '@/components/SocialShare'
+import MarkdownRenderer from '@/components/MarkdownRenderer'
 import Image from 'next/image'
 import type { Metadata } from 'next'
 
 type Props = {
   params: Promise<{ slug: string }>
 }
+
+// ISR: Revalidate every 1 hour (3600 seconds)
+export const revalidate = 3600
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
@@ -40,6 +45,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images: ogImage ? [ogImage] : [],
     },
   }
+}
+
+// Generate static params for the most recent posts at build time
+export async function generateStaticParams() {
+  const { createBuildClient } = await import('@/lib/supabase/build-client')
+  const supabase = createBuildClient()
+
+  const { data: posts } = await supabase
+    .from('posts')
+    .select('slug')
+    .eq('published', true)
+    .order('created_at', { ascending: false })
+    .limit(20)
+
+  return posts?.map((post) => ({
+    slug: post.slug,
+  })) || []
 }
 
 export default async function BlogPostPage({ params }: Props) {
@@ -122,13 +144,16 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       )}
 
-      <div className="prose dark:prose-invert max-w-none">
-        {post.content.split('\n').map((paragraph, index) => (
-          <p key={index} className="mb-4">
-            {paragraph}
-          </p>
-        ))}
-      </div>
+      <MarkdownRenderer content={post.content} />
+
+        {/* Social Share Buttons */}
+        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+          <SocialShare
+            title={post.title}
+            url={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/blog/${post.slug}`}
+            description={post.excerpt || undefined}
+          />
+        </div>
 
         <footer className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
           <a

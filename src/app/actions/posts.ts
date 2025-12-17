@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { postSchema, type PostFormData } from '@/lib/validations/schemas'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import type { PostWithTags } from '@/types/database'
 
 /**
@@ -19,7 +19,7 @@ export async function getPosts(options?: {
 
   let query = supabase
     .from('posts')
-    .select('*')
+    .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1)
 
@@ -27,14 +27,14 @@ export async function getPosts(options?: {
     query = query.eq('published', true)
   }
 
-  const { data, error } = await query
+  const { data, error, count } = await query
 
   if (error) {
     console.error('Error fetching posts:', error)
-    return { posts: [], error: error.message }
+    return { posts: [], total: 0, error: error.message }
   }
 
-  return { posts: data, error: null }
+  return { posts: data, total: count || 0, error: null }
 }
 
 /**
@@ -142,6 +142,7 @@ export async function createPost(formData: PostFormData) {
 
   revalidatePath('/blog')
   revalidatePath(`/blog/${post.slug}`)
+  revalidateTag('posts')
 
   return {
     success: true,
@@ -205,6 +206,7 @@ export async function updatePost(id: string, formData: PostFormData) {
 
   revalidatePath('/blog')
   revalidatePath(`/blog/${post.slug}`)
+  revalidateTag('posts')
 
   return {
     success: true,
@@ -229,6 +231,7 @@ export async function deletePost(id: string) {
   }
 
   revalidatePath('/blog')
+  revalidateTag('posts')
 
   return {
     success: true,
