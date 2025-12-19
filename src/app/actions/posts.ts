@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { postSchema, type PostFormData } from '@/lib/validations/schemas'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 import type { PostWithTags } from '@/types/database'
 
 /**
@@ -142,7 +142,6 @@ export async function createPost(formData: PostFormData) {
 
   revalidatePath('/blog')
   revalidatePath(`/blog/${post.slug}`)
-  revalidateTag('posts')
 
   return {
     success: true,
@@ -206,7 +205,6 @@ export async function updatePost(id: string, formData: PostFormData) {
 
   revalidatePath('/blog')
   revalidatePath(`/blog/${post.slug}`)
-  revalidateTag('posts')
 
   return {
     success: true,
@@ -231,7 +229,6 @@ export async function deletePost(id: string) {
   }
 
   revalidatePath('/blog')
-  revalidateTag('posts')
 
   return {
     success: true,

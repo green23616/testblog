@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react'
 import { Save, X } from 'lucide-react'
 import { ImageUploader } from '@/components/ImageUploader'
 import MarkdownEditor from '@/components/admin/MarkdownEditor'
+import PreviewPanel from '@/components/admin/PreviewPanel'
 
 interface PostFormProps {
   post?: Post
@@ -84,7 +85,7 @@ export function PostForm({ post, tags: initialTags }: PostFormProps) {
         </div>
       )}
 
-      {/* Title */}
+      {/* Title - Full Width */}
       <div>
         <label htmlFor="title" className="block text-sm font-medium mb-2">
           Title *
@@ -99,6 +100,11 @@ export function PostForm({ post, tags: initialTags }: PostFormProps) {
           placeholder="Enter post title"
         />
       </div>
+
+      {/* Split Layout: Editor Left, Preview Right */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* LEFT PANEL - Form Fields */}
+        <div className="space-y-6">
 
       {/* Slug */}
       <div>
@@ -290,6 +296,14 @@ export function PostForm({ post, tags: initialTags }: PostFormProps) {
           <X size={20} />
           Cancel
         </button>
+      </div>
+
+        </div>
+
+        {/* RIGHT PANEL - Preview */}
+        <div className="lg:sticky lg:top-4 lg:h-fit">
+          <PreviewPanel title={formData.title} content={formData.content} />
+        </div>
       </div>
     </form>
   )

@@ -41,8 +41,6 @@ export default function MarkdownEditor({ value, onChange, placeholder }: Markdow
         'code',
         'table',
         '|',
-        'preview',
-        'side-by-side',
         'fullscreen',
         '|',
         'guide',
