@@ -1,6 +1,6 @@
 import { getPosts } from '@/app/actions/posts'
 import Link from 'next/link'
-import { Plus, Edit, Trash2 } from 'lucide-react'
+import { Plus, Edit, Settings } from 'lucide-react'
 import { DeletePostButton } from '@/components/admin/DeletePostButton'
 
 export default async function AdminPostsPage() {
@@ -78,9 +78,16 @@ export default async function AdminPostsPage() {
                       <Link
                         href={`/admin/posts/${post.id}/edit`}
                         className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
-                        title="Edit"
+                        title="Edit Post"
                       >
                         <Edit size={18} />
+                      </Link>
+                      <Link
+                        href={`/admin/posts/${post.id}/metadata`}
+                        className="p-2 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded transition-colors"
+                        title="Manage Metadata"
+                      >
+                        <Settings size={18} />
                       </Link>
                       <DeletePostButton postId={post.id} postTitle={post.title} />
                     </div>
